@@ -158,10 +158,10 @@ public class CryptoUtil {
         return String.valueOf(password);
     }
 
-    public static String generateHmacSHA256(String plainText, SecretKey secretKey) throws NoSuchAlgorithmException, InvalidKeyException {
+    public static String generateHmacSHA256(String plainText, SecretKey key) throws NoSuchAlgorithmException, InvalidKeyException {
 
         Mac mac = Mac.getInstance("HmacSHA256");
-        mac.init(secretKey);
+        mac.init(key);
         byte[] doFinal = mac.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
         return  bytesToHex(doFinal);
     }
