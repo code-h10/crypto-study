@@ -4,6 +4,7 @@ import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -75,10 +76,22 @@ public class CryptoUtil {
      * @return
      * @throws NoSuchAlgorithmException
      */
-    public static SecretKey generateKey(int n) throws NoSuchAlgorithmException {
+    public static SecretKey generateKeyWithNumbers(int n) throws NoSuchAlgorithmException {
         KeyGenerator keyGenerator = KeyGenerator.getInstance(CryptoAlgorithm.AES.name());
         keyGenerator.init(n);
         SecretKey key = keyGenerator.generateKey();
+        return key;
+    }
+
+    /**
+     *
+     * @param keyString
+     * @return
+     * @throws NoSuchAlgorithmException
+     */
+    public static SecretKey generateKeyWithString(String keyString) throws NoSuchAlgorithmException {
+        byte[] bytes = keyString.getBytes(StandardCharsets.UTF_8);
+        SecretKey key = new SecretKeySpec(bytes, "AES");
         return key;
     }
 
@@ -144,4 +157,22 @@ public class CryptoUtil {
 
         return String.valueOf(password);
     }
+
+    public static String generateHmacSHA256(String plainText, SecretKey secretKey) throws NoSuchAlgorithmException, InvalidKeyException {
+
+        Mac mac = Mac.getInstance("HmacSHA256");
+        mac.init(secretKey);
+        byte[] doFinal = mac.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
+        return  bytesToHex(doFinal);
+    }
+
+    private static String bytesToHex(byte[] bytes) {
+        StringBuilder hex = new StringBuilder();
+        for (byte b : bytes) {
+            hex.append(String.format("%02x", b));
+        }
+        return hex.toString();
+    }
+
+
 }
